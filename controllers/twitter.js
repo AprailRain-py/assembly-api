@@ -101,7 +101,11 @@ exports.verifyAndTimeLine = async (req, res, next) => {
           unitl: "20200907",
         };
         //   , count: 20
-        T.get("statuses/home_timeline", options, function (err, data) {
+
+        const data = await T.get("statuses/home_timeline", options)
+
+        // await T.get("statuses/home_timeline", options, function (err, data) {
+          
           const timeLineData = data.map((data) => {
             const tweets = {
               tweets: data.full_text,
@@ -113,11 +117,12 @@ exports.verifyAndTimeLine = async (req, res, next) => {
               urls:
                 data.entities.urls.length > 0
                   ? data.entities.urls.map(
-                      (u) => `${u.url}|${u.expanded_url}|display_url`
+                      (u) => `${u.url}|${u.expanded_url}|${display_url}`
                     )
                   : "",
-              hasURL: data.entities.hashtags.length > 0 ? true : false,
+              hasURL: data.entities.urls.length > 0 ? true : false,
             };
+
             return tweets;
           });
 
@@ -125,15 +130,17 @@ exports.verifyAndTimeLine = async (req, res, next) => {
             userName: parsedData.name,
             tweets: timeLineData,
           });
-          user
-            .save()
-            .then((userData) => {
-              res.send({ homeTimeLine: userData, user: parsedData });
-              // console.log(data);
-              console.log("Successfull");
-            })
-            .catch((err) => console.log(err));
-        });
+        const newUser = await user.save()
+        res.send({ homeTimeLine: newUser, user: parsedData });
+        //   user
+        //     .save()
+        //     .then((userData) => {
+        //       res.send({ homeTimeLine: userData, user: parsedData });
+        //       // console.log(data);
+        //       console.log("Successfull");
+        //     })
+        //     .catch((err) => console.log(err));
+        // });
       }
     }
   );
