@@ -86,67 +86,56 @@ exports.verifyAndTimeLine = async (req, res, next) => {
         res.status(500).send({ error: "authentication error" });
       } else {
         const parsedData = JSON.parse(data);
-        const newUser = fetchHomeTimeLine(oAuthT, oAuthSc);
 
         // get home timeline
 
-        res.send({ homeTimeLine: newUser, user: parsedData });
-        //   user
-        //     .save()
-        //     .then((userData) => {
-        //       res.send({ homeTimeLine: userData, user: parsedData });
-        //       // console.log(data);
-        //       console.log("Successfull");
-        //     })
-        //     .catch((err) => console.log(err));
-        // });
+        var T = new Twit({
+          consumer_key: process.env.apikey,
+          consumer_secret: process.env.apisecret,
+          access_token: oAuthT,
+          access_token_secret: oAuthSc,
+        });
+        var options = {
+          tweet_mode: "extended",
+          result_type: "recent",
+          unitl: "20200907",
+        };
+        //   , count: 20
+        T.get("statuses/home_timeline", options, function (err, data) {
+          const timeLineData = data.map((data) => {
+            const tweets = {
+              tweets: data.full_text,
+              whoTweeted: data.user.name,
+              hashTags:
+                data.entities.hashtags.length > 0
+                  ? data.entities.hashtags.map((h) => h.text)
+                  : "",
+              urls:
+                data.entities.urls.length > 0
+                  ? data.entities.urls.map(
+                      (u) => `${u.url}|${u.expanded_url}|${display_url}`
+                    )
+                  : "",
+              hasURL: data.entities.urls.length > 0 ? true : false,
+            };
+
+            return tweets;
+          });
+
+          const user = new User({
+            userName: parsedData.name,
+            tweets: timeLineData,
+          });
+          user
+            .save()
+            .then((userData) => {
+              res.send({ homeTimeLine: userData, user: parsedData });
+              // console.log(data);
+              console.log("Successfull");
+            })
+            .catch((err) => console.log(err));
+        });
       }
     }
   );
 };
-
-async function fetchHomeTimeLine(oAuthT, oAuthSc) {
-  var T = new Twit({
-    consumer_key: process.env.apikey,
-    consumer_secret: process.env.apisecret,
-    access_token: oAuthT,
-    access_token_secret: oAuthSc,
-  });
-  var options = {
-    tweet_mode: "extended",
-    result_type: "recent",
-    unitl: "20200907",
-  };
-  //   , count: 20
-
-  const data = await T.get("statuses/home_timeline", options);
-
-  // await T.get("statuses/home_timeline", options, function (err, data) {
-
-  const timeLineData = data.map((data) => {
-    const tweets = {
-      tweets: data.full_text,
-      whoTweeted: data.user.name,
-      hashTags:
-        data.entities.hashtags.length > 0
-          ? data.entities.hashtags.map((h) => h.text)
-          : "",
-      urls:
-        data.entities.urls.length > 0
-          ? data.entities.urls.map(
-              (u) => `${u.url}|${u.expanded_url}|${display_url}`
-            )
-          : "",
-      hasURL: data.entities.urls.length > 0 ? true : false,
-    };
-
-    return tweets;
-  });
-
-  const user = new User({
-    userName: parsedData.name,
-    tweets: timeLineData,
-  });
-  const newUser = await user.save();
-  return newUser;
-}
