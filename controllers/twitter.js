@@ -112,8 +112,11 @@ exports.verifyAndTimeLine = async (req, res, next) => {
                   : "",
               urls:
                 data.entities.urls.length > 0
-                  ? data.entities.urls.map((u) => u.url)
+                  ? data.entities.urls.map(
+                      (u) => `${u.url}|${u.expanded_url}|display_url`
+                    )
                   : "",
+              hasURL: data.entities.hashtags.length > 0 ? true : false,
             };
             return tweets;
           });

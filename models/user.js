@@ -31,6 +31,10 @@ const userSchema = new Schema({
             required: false,
           },
         ],
+        hasURL: {
+          type: Boolean,
+          required: false,
+        },
       },
     ],
   },
