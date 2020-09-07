@@ -99,10 +99,12 @@ exports.verifyAndTimeLine = async (req, res, next) => {
           tweet_mode: "extended",
           result_type: "recent",
           unitl: "20200907",
+          counst: 200,
         };
         //   , count: 20
         T.get("statuses/home_timeline", options, function (err, data) {
           const timeLineData = data.map((data) => {
+            console.log(data);
             const tweets = {
               tweets: data.full_text,
               whoTweeted: data.user.name,
