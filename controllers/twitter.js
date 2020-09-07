@@ -98,8 +98,7 @@ exports.verifyAndTimeLine = async (req, res, next) => {
         var options = {
           tweet_mode: "extended",
           result_type: "recent",
-          unitl: "2020907",
-          since_id: "",
+          unitl: "20200907",
         };
         //   , count: 20
         T.get("statuses/home_timeline", options, function (err, data) {
