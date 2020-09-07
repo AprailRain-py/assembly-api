@@ -113,7 +113,7 @@ exports.verifyAndTimeLine = async (req, res, next) => {
               urls:
                 data.entities.urls.length > 0
                   ? data.entities.urls.map(
-                      (u) => `${u.url}|${u.expanded_url}|${display_url}`
+                      (u) => `${u.url}|${u.expanded_url}|${u.display_url}`
                     )
                   : "",
               hasURL: data.entities.urls.length > 0 ? true : false,
