@@ -8,7 +8,7 @@ const consumer = new oauth.OAuth(
   process.env.apikey,
   process.env.apisecret,
   "1.0A",
-  "http://localhost:8000/auth/twitter/callback",
+  "https://practical-hoover-59ac07.netlify.app/auth/twitter/callback",
   "HMAC-SHA1"
 );
 
