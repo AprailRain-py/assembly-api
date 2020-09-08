@@ -157,6 +157,9 @@ exports.verifyAndTimeLine = async (req, res, next) => {
           const user = new User({
             userName: parsedData.name,
             tweets: timeLineData,
+            tweetHasLink: tweetsWithURL,
+            userWithMostURL: userWithMostURL,
+            domainWithURL: domainCount,
           });
           user
             .save()
