@@ -103,6 +103,9 @@ exports.verifyAndTimeLine = async (req, res, next) => {
         };
         //   , count: 20
         T.get("statuses/home_timeline", options, function (err, data) {
+          let tweetsWithURL = 0;
+          let userWithMostURL = [];
+          let domainCount = [];
           const timeLineData = data.map((data) => {
             // console.log(data);
             const tweets = {
@@ -121,6 +124,33 @@ exports.verifyAndTimeLine = async (req, res, next) => {
               hasURL: data.entities.urls.length > 0 ? true : false,
             };
 
+            if (data.entities.urls.length > 0) {
+              tweetsWithURL += 1;
+
+              const dId = domainCount.findIndex(
+                (d) =>
+                  d.domain === data.entities.urls[0].display_url.split("/")[0]
+              );
+
+              if (dId === -1) {
+                domainCount.push({
+                  domain: data.entities.urls[0].display_url.split("/")[0],
+                  count: 0,
+                });
+              } else {
+                domainCount[dId].count += 1;
+              }
+
+              const uId = userWithMostURL.findIndex(
+                (u) => u.name === data.user.name
+              );
+              // console.log(uId);
+              if (uId === -1) {
+                userWithMostURL.push({ name: data.user.name, count: 0 });
+              } else {
+                userWithMostURL[uId].count += 1;
+              }
+            }
             return tweets;
           });
 
@@ -131,9 +161,20 @@ exports.verifyAndTimeLine = async (req, res, next) => {
           user
             .save()
             .then((userData) => {
-              res.send({ homeTimeLine: userData, user: parsedData });
+              res.send({
+                homeTimeLine: userData,
+                user: parsedData,
+                tweetHasLink: tweetsWithURL,
+                userWithMostURL: userWithMostURL,
+                domainWithURL: domainCount,
+              });
               // console.log(data);
-              console.log("Successfull");
+              console.log(
+                "Successfull",
+                tweetsWithURL,
+                userWithMostURL,
+                domainCount
+              );
             })
             .catch((err) => console.log(err));
         });

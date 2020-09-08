@@ -31,18 +31,42 @@ app.get("/", async (req, res, next) => {
   };
   //   , count: 20
   T.get("statuses/home_timeline", options, function (err, data) {
-    res.send(data);
+    let tweetsWithURL = 0;
+    let userWithMostURL = [];
+    let domainCount = [];
+    data.map((data) => {
+      if (data.entities.urls.length > 0) {
+        tweetsWithURL += 1;
+
+        const dId = domainCount.findIndex(
+          (d) => d.domain === data.entities.urls[0].display_url.split("/")[0]
+        );
+
+        if (dId === -1) {
+          domainCount.push({
+            domain: data.entities.urls[0].display_url.split("/")[0],
+            count: 0,
+          });
+        } else {
+          domainCount[dId].count += 1;
+        }
+
+        const uId = userWithMostURL.findIndex((u) => u.name === data.user.name);
+        // console.log(uId);
+        if (uId === -1) {
+          userWithMostURL.push({ name: data.user.name, count: 0 });
+        } else {
+          userWithMostURL[uId].count += 1;
+        }
+      }
+    });
+    // res.send(tweetsWithURL);
+    res.send({
+      tweetHasLink: tweetsWithURL,
+      userWithMostURL: userWithMostURL,
+      domainWithURL: domainCount,
+    });
   });
-  // const User = require("./models/user");
-  // const tweetHasLink = await User.find({
-  //   "tweets.hasURL": true,
-  // }).estimatedDocumentCount();
-  // const userWithMostLinkShared = await User.find({
-  //   "tweets.hasURL": true,
-  // }).select({ "tweets.whoTweeted": 1, _id: 0 });
-  // const tweetWithDomain = await User.find({
-  //   "tweets.hasURL": true,
-  // }).select({ "tweets.urls": 1, _id: 0 });
 });
 
 mongoose
