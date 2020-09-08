@@ -35,6 +35,34 @@ const userSchema = new Schema({
           type: Boolean,
           required: false,
         },
+        tweetHasLink: {
+          type: Number,
+          required: false,
+        },
+        userWithMostURL: [
+          {
+            name: {
+              type: String,
+              required: false,
+            },
+            count: {
+              type: Number,
+              required: false,
+            },
+          },
+        ],
+        domainWithURL: [
+          {
+            domain: {
+              type: String,
+              required: false,
+            },
+            count: {
+              type: Number,
+              required: false,
+            },
+          },
+        ],
       },
     ],
   },
