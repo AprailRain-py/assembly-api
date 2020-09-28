@@ -1,3 +1,4 @@
+require("dotenv-safe").config();
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -7,7 +8,7 @@ const mongoose = require("mongoose");
 const twitterRoutes = require("./routes/twitterAuth");
 
 const mongoDBURL = process.env.mongoURL;
-
+console.log(mongoDBURL);
 app.use(cors());
 
 app.use(express.json());
